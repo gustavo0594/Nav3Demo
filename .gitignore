@@ -1,0 +1,36 @@
+# Build Artifacts
+*.apk
+*.aab
+*.dex
+build/
+bin/
+gen/
+out/
+
+# Gradle
+.gradle/
+local.properties
+
+# Android Studio / IntelliJ
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/libraries/
+.idea/caches/
+.idea/dictionaries/
+.idea/assetWizardSettings.xml
+.navigation/
+captures/
+*.iml
+
+# Kotlin
+.kotlin/
+
+# Keystores & Logs
+*.jks
+*.keystore
+*.log
+
+# Misc
+.DS_Store
+Thumbs.db
