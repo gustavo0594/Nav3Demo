@@ -29,11 +29,10 @@ fun PokemonDetailScreen(
     pokemonId: Int,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PokemonDetailViewModel = viewModel()
-) {
-    LaunchedEffect(pokemonId) {
-        viewModel.onIntent(PokemonDetailIntent.LoadPokemon(pokemonId))
+    viewModel: PokemonDetailViewModel = viewModel {
+        PokemonDetailViewModel(pokemonId)
     }
+) {
     LaunchedEffect(Unit) {
         viewModel.events.collect {
             onNavigateBack()

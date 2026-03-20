@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PokemonDetailViewModel(
+    pokemonId: Int,
     private val repository: PokemonRepository = PokemonRepository()
 ) : ViewModel() {
 
@@ -19,6 +20,10 @@ class PokemonDetailViewModel(
 
     private val _events = MutableSharedFlow<PokemonDetailEvent>()
     val events = _events.asSharedFlow()
+
+    init {
+        onIntent(PokemonDetailIntent.LoadPokemon(pokemonId))
+    }
 
     fun onIntent(intent: PokemonDetailIntent) {
         when (intent) {
