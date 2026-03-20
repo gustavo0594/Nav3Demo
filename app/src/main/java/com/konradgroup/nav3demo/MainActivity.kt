@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.konradgroup.nav3demo.ui.navigation.NavigationRoot
+import com.konradgroup.nav3demo.ui.pokemons.list.PokemonListScreen
 import com.konradgroup.nav3demo.ui.theme.Nav3DemoTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,7 +18,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             Nav3DemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavigationRoot(modifier = Modifier.padding(innerPadding))
+                    PokemonListScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        onFilterClicked = {},
+                        onPokemonSelected = {}
+                    )
                 }
             }
         }
