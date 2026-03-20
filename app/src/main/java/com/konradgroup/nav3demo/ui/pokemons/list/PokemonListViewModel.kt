@@ -2,6 +2,7 @@ package com.konradgroup.nav3demo.ui.pokemons.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.konradgroup.nav3demo.data.Pokemon
 import com.konradgroup.nav3demo.data.PokemonRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ class PokemonListViewModel(
     fun onIntent(intent: PokemonIntent) {
         when (intent) {
             is PokemonIntent.LoadPokemons -> fetchPokemons()
+            is PokemonIntent.FilterByType -> filterByType(intent.type)
             is PokemonIntent.PokemonSelected -> viewModelScope.launch {
                 _events.emit(PokemonEvent.NavigateToPokemonDetail(intent.id))
             }
@@ -34,21 +36,41 @@ class PokemonListViewModel(
             is PokemonIntent.FilterClicked -> viewModelScope.launch {
                 _events.emit(PokemonEvent.NavigateToFilters)
             }
+
+            is PokemonIntent.ResetFilter -> fetchPokemons()
         }
     }
 
     private fun fetchPokemons() {
         viewModelScope.launch {
-            _state.update {
-                val items = repository.getPokemons().map { pokemon ->
-                    PokemonUI(
-                        id = pokemon.id,
-                        name = pokemon.name,
-                        description = pokemon.description
-                    )
-                }
-                it.copy(pokemons = items)
+            val pokemons = repository.getPokemons()
+            updateDataSource(pokemons)
+        }
+    }
+
+    private fun filterByType(type: String) {
+        viewModelScope.launch {
+            val pokemons = repository.filterPokemonsByType(type)
+            updateDataSource(pokemons = pokemons, filter = type)
+        }
+    }
+
+    private fun updateDataSource(
+        pokemons: List<Pokemon>,
+        filter: String? = null
+    ) {
+        _state.update {
+            val items = pokemons.map { pokemon ->
+                PokemonUI(
+                    id = pokemon.id,
+                    name = pokemon.name,
+                    description = pokemon.description
+                )
             }
+            it.copy(
+                pokemons = items,
+                filter = filter
+            )
         }
     }
 }
@@ -57,6 +79,8 @@ sealed interface PokemonIntent {
     data object LoadPokemons : PokemonIntent
     data class PokemonSelected(val id: Int) : PokemonIntent
     data object FilterClicked : PokemonIntent
+    data class FilterByType(val type: String) : PokemonIntent
+    data object ResetFilter : PokemonIntent
 }
 
 sealed interface PokemonEvent {
@@ -65,7 +89,8 @@ sealed interface PokemonEvent {
 }
 
 data class PokemonUIState(
-    val pokemons: List<PokemonUI> = emptyList()
+    val pokemons: List<PokemonUI> = emptyList(),
+    val filter: String? = null
 )
 
 

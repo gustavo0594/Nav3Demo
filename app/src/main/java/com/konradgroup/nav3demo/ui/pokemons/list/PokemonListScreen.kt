@@ -3,7 +3,6 @@ package com.konradgroup.nav3demo.ui.pokemons.list
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +44,7 @@ fun PokemonListScreen(
         uiState = uiState,
         onPokemonSelected = { viewModel.onIntent(PokemonIntent.PokemonSelected(it)) },
         onFilterClicked = { viewModel.onIntent(PokemonIntent.FilterClicked) },
+        onResetFilter = { viewModel.onIntent(PokemonIntent.ResetFilter) }
     )
 }
 
@@ -53,6 +54,7 @@ private fun Content(
     uiState: PokemonUIState,
     onPokemonSelected: (Int) -> Unit,
     onFilterClicked: () -> Unit,
+    onResetFilter: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -60,8 +62,19 @@ private fun Content(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (uiState.filter != null) {
+                    Text(text = "Filter: ${uiState.filter}")
+                    Button(onClick = onResetFilter) { Text(text = "Reset Filter") }
+                }
+            }
             Button(onClick = onFilterClicked) { Text(text = "Filters") }
         }
         LazyColumn(
