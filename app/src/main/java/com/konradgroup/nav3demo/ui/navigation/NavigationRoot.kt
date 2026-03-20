@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.konradgroup.nav3demo.ui.pokemons.detail.PokemonDetailScreen
 import com.konradgroup.nav3demo.ui.pokemons.filters.PokemonFiltersScreen
@@ -14,11 +17,15 @@ import com.konradgroup.nav3demo.ui.pokemons.list.PokemonListScreen
 fun NavigationRoot(
     modifier: Modifier = Modifier,
 ) {
-    val backStack =  remember { mutableStateListOf<Route>(Route.PokemonList) }
+    val backStack = rememberNavBackStack(Route.PokemonList)
     NavDisplay(
         modifier = modifier,
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
         entryProvider = { key ->
             when (key) {
                 is Route.PokemonList -> {
@@ -49,6 +56,7 @@ fun NavigationRoot(
                         )
                     }
                 }
+                else -> throw IllegalArgumentException("Unknown route: $key")
             }
         }
     )

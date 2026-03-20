@@ -1,10 +1,17 @@
 package com.konradgroup.nav3demo.ui.navigation
 
-sealed interface Route {
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 
+@Serializable
+sealed interface Route: NavKey {
+
+    @Serializable
     data object PokemonList : Route
+    @Serializable
 
     data class PokemonDetail(val id: Int) : Route
+    @Serializable
 
     data object PokemonFilters : Route
 
