@@ -19,4 +19,10 @@ class PokemonRepository(
             POKEMONS.flatMap { it.types }
                 .toSet()
         }
+
+    suspend fun filterPokemonsByType(filter: String):List<Pokemon> =
+        withContext(dispatcher) {
+            POKEMONS.filter { it.types.contains(filter) }
+        }
+
 }
