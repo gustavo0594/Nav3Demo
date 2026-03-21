@@ -20,6 +20,7 @@ import com.konradgroup.nav3demo.ui.favorites.FavoritePokemonListScreen
 import com.konradgroup.nav3demo.ui.pokemons.detail.PokemonDetailScreen
 import com.konradgroup.nav3demo.ui.pokemons.filters.PokemonFiltersScreen
 import com.konradgroup.nav3demo.ui.pokemons.list.PokemonListScreen
+import com.konradgroup.nav3demo.ui.settings.ProfileScreen
 import com.konradgroup.nav3demo.ui.settings.SettingsScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -99,7 +100,16 @@ fun NavigationRoot(
                         FavoritePokemonListScreen()
                     }
                     entry<Route.Settings> {
-                        SettingsScreen()
+                        SettingsScreen(
+                            goToProfile = { navigator.navigate(Route.Profile) }
+                        )
+                    }
+                    entry<Route.Profile> {
+                        ProfileScreen(
+                            navigateBack = {
+                                navigator.goBack()
+                            }
+                        )
                     }
                 }
             )
