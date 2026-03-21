@@ -7,11 +7,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.runtime.serialization.NavKeySerializer
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
+import com.konradgroup.nav3demo.ui.navigation.decorators.rememberAnalyticsNavEntryDecorator
 
 /**
  * State holder for managing navigation across multiple top-level back stacks in a Navigation 3 setup.
@@ -74,4 +81,26 @@ fun rememberNavigationState(
             backStacks = backStacks
         )
     }
+}
+
+@Composable
+fun NavigationState.toEntries(
+    entryProvider: (NavKey) -> NavEntry<NavKey>
+): SnapshotStateList<NavEntry<NavKey>> {
+    val decoratedEntries = backStacks.mapValues { (_, stack) ->
+        val decorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
+            rememberViewModelStoreNavEntryDecorator(),
+            rememberAnalyticsNavEntryDecorator()
+        )
+        rememberDecoratedNavEntries(
+            backStack = stack,
+            entryDecorators = decorators,
+            entryProvider = entryProvider
+        )
+    }
+
+    return stacksInUse
+        .flatMap { decoratedEntries[it] ?: emptyList() }
+        .toMutableStateList()
 }
