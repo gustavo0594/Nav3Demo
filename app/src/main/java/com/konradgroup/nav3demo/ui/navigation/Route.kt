@@ -4,15 +4,15 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface Route: NavKey {
+sealed interface Route : NavKey {
 
     @Serializable
     data object PokemonList : Route
-    @Serializable
 
+    @Serializable
     data class PokemonDetail(val id: Int) : Route
-    @Serializable
 
+    @Serializable
     data object PokemonFilters : Route
 
 }

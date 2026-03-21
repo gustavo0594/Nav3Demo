@@ -1,5 +1,6 @@
 package com.konradgroup.nav3demo.ui.pokemons.filters
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +32,7 @@ fun PokemonFiltersScreen(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     Content(
         filters = uiState.filters,
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier.background(MaterialTheme.colorScheme.background).padding(16.dp),
         onNavigateBack = { 
             onNavigateBack()
             viewModel.onIntent(PokemonFiltersIntent.OnBackClicked) 
