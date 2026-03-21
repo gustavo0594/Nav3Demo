@@ -20,15 +20,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.konradgroup.nav3demo.ui.navigation.ResultStore
 
 @Composable
 fun PokemonListScreen(
     onPokemonSelected: (Int) -> Unit,
     onFilterClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    resultStore: ResultStore,
     viewModel: PokemonListViewModel = viewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val filter = resultStore.getResult<String>("pokemon-filter")
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -36,6 +39,9 @@ fun PokemonListScreen(
                 is PokemonEvent.NavigateToFilters -> onFilterClicked()
             }
         }
+    }
+    LaunchedEffect(filter) {
+        viewModel.onIntent(PokemonIntent.LoadPokemons(filter))
     }
     Content(
         modifier = modifier

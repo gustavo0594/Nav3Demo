@@ -20,15 +20,10 @@ class PokemonListViewModel(
     private val _events = MutableSharedFlow<PokemonEvent>()
     val events = _events.asSharedFlow()
 
-    init {
-        onIntent(PokemonIntent.LoadPokemons)
-    }
-
 
     fun onIntent(intent: PokemonIntent) {
         when (intent) {
-            is PokemonIntent.LoadPokemons -> fetchPokemons()
-            is PokemonIntent.FilterByType -> filterByType(intent.type)
+            is PokemonIntent.LoadPokemons -> fetchPokemons(filter = intent.filter)
             is PokemonIntent.PokemonSelected -> viewModelScope.launch {
                 _events.emit(PokemonEvent.NavigateToPokemonDetail(intent.id))
             }
@@ -41,19 +36,13 @@ class PokemonListViewModel(
         }
     }
 
-    private fun fetchPokemons() {
+    private fun fetchPokemons(filter: String? = null) {
         viewModelScope.launch {
-            val pokemons = repository.getPokemons()
-            updateDataSource(pokemons)
+            val pokemons = if (filter!= null) repository.filterPokemonsByType(filter) else repository.getPokemons()
+            updateDataSource(pokemons, filter = filter)
         }
     }
 
-    private fun filterByType(type: String) {
-        viewModelScope.launch {
-            val pokemons = repository.filterPokemonsByType(type)
-            updateDataSource(pokemons = pokemons, filter = type)
-        }
-    }
 
     private fun updateDataSource(
         pokemons: List<Pokemon>,
@@ -76,10 +65,9 @@ class PokemonListViewModel(
 }
 
 sealed interface PokemonIntent {
-    data object LoadPokemons : PokemonIntent
+    data class LoadPokemons(val filter: String? = null) : PokemonIntent
     data class PokemonSelected(val id: Int) : PokemonIntent
     data object FilterClicked : PokemonIntent
-    data class FilterByType(val type: String) : PokemonIntent
     data object ResetFilter : PokemonIntent
 }
 

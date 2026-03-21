@@ -7,6 +7,8 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
@@ -32,6 +34,7 @@ fun NavigationRoot(
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
     val dialogStrategy = DialogSceneStrategy<NavKey>()
     val combinedStrategy = dialogStrategy then listDetailStrategy
+    val resultStore = rememberResultStore()
     NavDisplay(
         modifier = modifier,
         backStack = backStack,
@@ -61,7 +64,8 @@ fun NavigationRoot(
                     },
                     onFilterClicked = {
                         backStack.add(Route.PokemonFilters)
-                    }
+                    },
+                    resultStore = resultStore
                 )
             }
             entry<Route.PokemonDetail>(
@@ -72,16 +76,10 @@ fun NavigationRoot(
                     onNavigateBack = { backStack.removeLastOrNull() }
                 )
             }
-            entry<Route.PokemonFilters>(
-                metadata = DialogSceneStrategy.dialog(
-                    dialogProperties = DialogProperties(
-                        usePlatformDefaultWidth = false
-                    )
-                )
-            ) {
+            entry<Route.PokemonFilters> {
                 PokemonFiltersScreen(
                     onNavigateBack = { backStack.removeLastOrNull() },
-                    onFilterSelected = {}
+                    resultStore = resultStore,
                 )
             }
         }
