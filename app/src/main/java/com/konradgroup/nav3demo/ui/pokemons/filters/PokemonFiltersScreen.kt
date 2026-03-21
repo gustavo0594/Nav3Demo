@@ -25,26 +25,27 @@ import com.konradgroup.nav3demo.ui.navigation.ResultStore
 
 @Composable
 fun PokemonFiltersScreen(
-    resultStore: ResultStore,
     onNavigateBack: () -> Unit,
+    onFilterSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PokemonFiltersViewModel = viewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
-        viewModel.events.collect {
-            onNavigateBack()
+        viewModel.events.collect {event ->
+            when(event) {
+                is PokemonFiltersEvent.NavigateToPokemons -> onFilterSelected(event.filter)
+                is PokemonFiltersEvent.NavigateBack -> onNavigateBack()
+            }
         }
     }
     Content(
         filters = uiState.filters,
         modifier = modifier.background(MaterialTheme.colorScheme.background).padding(16.dp),
-        onNavigateBack = { 
-            onNavigateBack()
+        onNavigateBack = {
             viewModel.onIntent(PokemonFiltersIntent.OnBackClicked) 
         },
-        onFilterSelected = { 
-            resultStore.setResult("pokemon-filter", it)
+        onFilterSelected = {
             viewModel.onIntent(PokemonFiltersIntent.OnFilterSelected(it)) 
         },
     )

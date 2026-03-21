@@ -50,7 +50,10 @@ fun PokemonListScreen(
         uiState = uiState,
         onPokemonSelected = { viewModel.onIntent(PokemonIntent.PokemonSelected(it)) },
         onFilterClicked = { viewModel.onIntent(PokemonIntent.FilterClicked) },
-        onResetFilter = { viewModel.onIntent(PokemonIntent.ResetFilter) }
+        onResetFilter = {
+            resultStore.removeResult("pokemon-filter")
+            viewModel.onIntent(PokemonIntent.ResetFilter)
+        }
     )
 }
 

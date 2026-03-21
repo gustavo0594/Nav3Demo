@@ -8,6 +8,7 @@ import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ fun NavigationRoot(
     modifier: Modifier = Modifier,
 ) {
     val backStack = rememberNavBackStack(Route.PokemonList)
+    val navigator = remember { Navigator(backStack) }
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
     val dialogStrategy = DialogSceneStrategy<NavKey>()
     val combinedStrategy = dialogStrategy then listDetailStrategy
@@ -38,7 +40,7 @@ fun NavigationRoot(
     NavDisplay(
         modifier = modifier,
         backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
+        onBack = navigator::goBack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),
@@ -60,10 +62,10 @@ fun NavigationRoot(
             ) {
                 PokemonListScreen(
                     onPokemonSelected = {
-                        backStack.add(Route.PokemonDetail(it))
+                        navigator.navigate(Route.PokemonDetail(it))
                     },
                     onFilterClicked = {
-                        backStack.add(Route.PokemonFilters)
+                        navigator.navigate(Route.PokemonFilters)
                     },
                     resultStore = resultStore
                 )
@@ -73,13 +75,16 @@ fun NavigationRoot(
             ) { key ->
                 PokemonDetailScreen(
                     pokemonId = key.id,
-                    onNavigateBack = { backStack.removeLastOrNull() }
+                    onNavigateBack = {navigator.goBack() }
                 )
             }
             entry<Route.PokemonFilters> {
                 PokemonFiltersScreen(
-                    onNavigateBack = { backStack.removeLastOrNull() },
-                    resultStore = resultStore,
+                    onNavigateBack = { navigator.goBack() },
+                    onFilterSelected = {
+                        resultStore.setResult("pokemon-filter", it)
+                        navigator.goBack()
+                    }
                 )
             }
         }
