@@ -1,4 +1,4 @@
-package com.konradgroup.nav3demo.ui.pokemons.settings
+package com.konradgroup.nav3demo.ui.settings
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
