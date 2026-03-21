@@ -13,18 +13,17 @@ data class BottomNavItem(
     val title: String,
 )
 
-// TODO add when routes are ready
-//val TOP_LEVEL_DESTINATIONS = mapOf(
-//    Route.PokemonList to BottomNavItem(
-//        icon = Icons.Outlined.Home,
-//        title = "Pokemons"
-//    ),
-//    Route.PokemonFavorites to BottomNavItem(
-//        icon = Icons.Outlined.Favorite,
-//        title = "Favorites"
-//    ),
-//    Route.PokemonList to BottomNavItem(
-//        icon = Icons.Outlined.Settings,
-//        title = "Settings"
-//    ),
-//)
+val TOP_LEVEL_DESTINATIONS = mapOf(
+    Route.PokemonList to BottomNavItem(
+        icon = Icons.Outlined.Home,
+        title = "Pokemons"
+    ),
+    Route.PokemonFavorites to BottomNavItem(
+        icon = Icons.Outlined.Favorite,
+        title = "Favorites"
+    ),
+    Route.PokemonList to BottomNavItem(
+        icon = Icons.Outlined.Settings,
+        title = "Settings"
+    ),
+)

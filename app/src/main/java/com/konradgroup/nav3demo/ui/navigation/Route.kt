@@ -15,4 +15,9 @@ sealed interface Route : NavKey {
     @Serializable
     data object PokemonFilters : Route
 
+    @Serializable
+    data object PokemonFavorites : Route
+
+    @Serializable
+    data object Settings : Route
 }

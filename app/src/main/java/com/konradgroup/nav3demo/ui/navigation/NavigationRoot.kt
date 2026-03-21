@@ -2,6 +2,8 @@ package com.konradgroup.nav3demo.ui.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
@@ -31,62 +33,77 @@ import kotlin.collections.listOf
 fun NavigationRoot(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = rememberNavBackStack(Route.PokemonList)
-    val navigator = remember { Navigator(backStack) }
+    val navigationState = rememberNavigationState(
+        startRoute = Route.PokemonList,
+        topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
+    )
+    val navigator = remember { Navigator(navigationState) }
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
     val dialogStrategy = DialogSceneStrategy<NavKey>()
     val combinedStrategy = dialogStrategy then listDetailStrategy
     val resultStore = rememberResultStore()
-    NavDisplay(
+
+    Scaffold(
         modifier = modifier,
-        backStack = backStack,
-        onBack = navigator::goBack,
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-            rememberAnalyticsNavEntryDecorator()
-        ),
-        sceneStrategy = combinedStrategy,
-        entryProvider = entryProvider {
-            entry<Route.PokemonList>(
-                metadata = ListDetailSceneStrategy.listPane(
-                    detailPlaceholder = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "Detail placeholder")
-                        }
-                    }
-                )
-            ) {
-                PokemonListScreen(
-                    onPokemonSelected = {
-                        navigator.navigate(Route.PokemonDetail(it))
-                    },
-                    onFilterClicked = {
-                        navigator.navigate(Route.PokemonFilters)
-                    },
-                    resultStore = resultStore
-                )
-            }
-            entry<Route.PokemonDetail>(
-                metadata = ListDetailSceneStrategy.detailPane()
-            ) { key ->
-                PokemonDetailScreen(
-                    pokemonId = key.id,
-                    onNavigateBack = {navigator.goBack() }
-                )
-            }
-            entry<Route.PokemonFilters> {
-                PokemonFiltersScreen(
-                    onNavigateBack = { navigator.goBack() },
-                    onFilterSelected = {
-                        resultStore.setResult("pokemon-filter", it)
-                        navigator.goBack()
-                    }
-                )
-            }
+        bottomBar = {
+            PokedexNavigationBar(
+                selectedKey = navigationState.topLevelRoute,
+                onSelectKey = { navigator.navigate(it) }
+            )
         }
-    )
+    ) {innerPadding->
+        NavDisplay(
+            modifier =Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            onBack = navigator::goBack,
+//            entryDecorators = listOf(
+//                rememberSaveableStateHolderNavEntryDecorator(),
+//                rememberViewModelStoreNavEntryDecorator(),
+//                rememberAnalyticsNavEntryDecorator()
+//            ),
+//            sceneStrategy = combinedStrategy,
+            entryProvider = entryProvider {
+                entry<Route.PokemonList>(
+                    metadata = ListDetailSceneStrategy.listPane(
+                        detailPlaceholder = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "Detail placeholder")
+                            }
+                        }
+                    )
+                ) {
+                    PokemonListScreen(
+                        onPokemonSelected = {
+                            navigator.navigate(Route.PokemonDetail(it))
+                        },
+                        onFilterClicked = {
+                            navigator.navigate(Route.PokemonFilters)
+                        },
+                        resultStore = resultStore
+                    )
+                }
+                entry<Route.PokemonDetail>(
+                    metadata = ListDetailSceneStrategy.detailPane()
+                ) { key ->
+                    PokemonDetailScreen(
+                        pokemonId = key.id,
+                        onNavigateBack = { navigator.goBack() }
+                    )
+                }
+                entry<Route.PokemonFilters> {
+                    PokemonFiltersScreen(
+                        onNavigateBack = { navigator.goBack() },
+                        onFilterSelected = {
+                            resultStore.setResult("pokemon-filter", it)
+                            navigator.goBack()
+                        }
+                    )
+                }
+            }
+        )
+    }
 }
