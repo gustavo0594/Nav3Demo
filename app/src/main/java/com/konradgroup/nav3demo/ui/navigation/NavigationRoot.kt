@@ -9,24 +9,18 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
-import com.konradgroup.nav3demo.ui.navigation.decorators.rememberAnalyticsNavEntryDecorator
+import com.konradgroup.nav3demo.ui.favorites.FavoritePokemonListScreen
 import com.konradgroup.nav3demo.ui.pokemons.detail.PokemonDetailScreen
 import com.konradgroup.nav3demo.ui.pokemons.filters.PokemonFiltersScreen
 import com.konradgroup.nav3demo.ui.pokemons.list.PokemonListScreen
-import kotlin.collections.listOf
+import com.konradgroup.nav3demo.ui.settings.SettingsScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -51,59 +45,64 @@ fun NavigationRoot(
                 onSelectKey = { navigator.navigate(it) }
             )
         }
-    ) {innerPadding->
+    ) { innerPadding ->
         NavDisplay(
-            modifier =Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
             onBack = navigator::goBack,
-//            entryDecorators = listOf(
-//                rememberSaveableStateHolderNavEntryDecorator(),
-//                rememberViewModelStoreNavEntryDecorator(),
-//                rememberAnalyticsNavEntryDecorator()
-//            ),
-//            sceneStrategy = combinedStrategy,
-            entryProvider = entryProvider {
-                entry<Route.PokemonList>(
-                    metadata = ListDetailSceneStrategy.listPane(
-                        detailPlaceholder = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = "Detail placeholder")
+            sceneStrategy = combinedStrategy,
+            entries = navigationState.toEntries(
+                entryProvider {
+                    entry<Route.PokemonList>(
+                        metadata = ListDetailSceneStrategy.listPane(
+                            detailPlaceholder = {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = "Detail placeholder")
+                                }
                             }
-                        }
-                    )
-                ) {
-                    PokemonListScreen(
-                        onPokemonSelected = {
-                            navigator.navigate(Route.PokemonDetail(it))
-                        },
-                        onFilterClicked = {
-                            navigator.navigate(Route.PokemonFilters)
-                        },
-                        resultStore = resultStore
-                    )
+                        )
+                    ) {
+                        PokemonListScreen(
+                            onPokemonSelected = {
+                                navigator.navigate(Route.PokemonDetail(it))
+                            },
+                            onFilterClicked = {
+                                navigator.navigate(Route.PokemonFilters)
+                            },
+                            resultStore = resultStore
+                        )
+                    }
+                    entry<Route.PokemonDetail>(
+                        metadata = ListDetailSceneStrategy.detailPane()
+                    ) { key ->
+                        PokemonDetailScreen(
+                            pokemonId = key.id,
+                            onNavigateBack = { navigator.goBack() }
+                        )
+                    }
+                    entry<Route.PokemonFilters>(
+                        metadata = DialogSceneStrategy.dialog()
+                    ) {
+                        PokemonFiltersScreen(
+                            onNavigateBack = { navigator.goBack() },
+                            onFilterSelected = {
+                                resultStore.setResult("pokemon-filter", it)
+                                navigator.goBack()
+                            }
+                        )
+                    }
+                    entry<Route.PokemonFavorites> {
+                        FavoritePokemonListScreen()
+                    }
+                    entry<Route.Settings> {
+                        SettingsScreen()
+                    }
                 }
-                entry<Route.PokemonDetail>(
-                    metadata = ListDetailSceneStrategy.detailPane()
-                ) { key ->
-                    PokemonDetailScreen(
-                        pokemonId = key.id,
-                        onNavigateBack = { navigator.goBack() }
-                    )
-                }
-                entry<Route.PokemonFilters> {
-                    PokemonFiltersScreen(
-                        onNavigateBack = { navigator.goBack() },
-                        onFilterSelected = {
-                            resultStore.setResult("pokemon-filter", it)
-                            navigator.goBack()
-                        }
-                    )
-                }
-            }
+            )
         )
     }
 }
