@@ -23,7 +23,7 @@ data class BottomNavItem(
 //        icon = Icons.Outlined.Favorite,
 //        title = "Favorites"
 //    ),
-//    Route.PokemonList to BottomNavItem(
+//    Route.Settings to BottomNavItem(
 //        icon = Icons.Outlined.Settings,
 //        title = "Settings"
 //    ),
